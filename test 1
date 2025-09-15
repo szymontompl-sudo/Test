@@ -1,0 +1,314 @@
+local TweenService = game:GetService("TweenService")
+
+local mainFrame = gui:WaitForChild("MainFrame")
+local sideMenu = mainFrame:WaitForChild("SideMenu")
+local contentFrame = mainFrame:WaitForChild("ContentFrame")
+
+local closeBtn = mainFrame:WaitForChild("CloseButton")
+local minimizeBtn = mainFrame:WaitForChild("MinimizeButton")
+
+local tabs = {
+    "Obby", "Brick", "Killstreak", "Run", "Bus",
+    "Redacted", "Moyai", "Tycoon", "Voodoo"
+}
+
+local tabContent = {}
+
+-- Helper for toggle button
+local function createToggleButton(parent, text, onToggle)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 0, 40)
+    frame.BackgroundTransparency = 1
+    frame.Parent = parent
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.7, 0, 1, 0)
+    label.Position = UDim2.new(0, 0, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextScaled = true
+    label.Font = Enum.Font.SourceSans
+    label.TextColor3 = Color3.new(1,1,1)
+    label.Parent = frame
+
+    local toggle = Instance.new("TextButton")
+    toggle.Size = UDim2.new(0, 32, 0, 32)
+    toggle.Position = UDim2.new(0.85, -16, 0.5, -16)
+    toggle.BackgroundColor3 = Color3.fromRGB(80,80,80)
+    toggle.Text = ""
+    toggle.Parent = frame
+
+    local toggled = false
+    local running = false
+
+    local function updateToggle()
+        toggle.BackgroundColor3 = toggled and Color3.fromRGB(20,20,20) or Color3.fromRGB(80,80,80)
+    end
+
+    toggle.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        updateToggle()
+        if toggled then
+            running = true
+            onToggle(true, function() return running end)
+        else
+            running = false
+        end
+    end)
+    updateToggle()
+    return frame
+end
+
+-- Content for each tab
+tabContent["Obby"] = function()
+    contentFrame:ClearAllChildren()
+    local toggle = createToggleButton(contentFrame, "AutoTp to killbrick", function(enabled, isRunning)
+        while enabled and isRunning() do
+           -- Teleport to killbrick, die, enter arena
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+local killbrick = workspace:FindFirstChild("KillBrick")
+if killbrick and character then
+    character:SetPrimaryPartCFrame(killbrick.CFrame)
+    character:BreakJoints()
+end
+            wait(1)
+        end
+    end)
+end
+
+tabContent["Brick"] = function()
+    contentFrame:ClearAllChildren()
+    local toggle = createToggleButton(contentFrame, "AutoTp to bricks", function(enabled, isRunning)
+        while enabled and isRunning() do
+            -- Teleport to brick, ragdoll, enter arena
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+local brick = workspace:FindFirstChild("Brick")
+if brick and character then
+    character:SetPrimaryPartCFrame(brick.CFrame)
+    -- Ragdoll effect (if available)
+    if character:FindFirstChild("Humanoid") then
+        character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+    end
+end
+            wait(1)
+        end
+    end)
+end
+
+tabContent["Killstreak"] = function()
+    contentFrame:ClearAllChildren()
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1,0,0,30)
+    label.BackgroundTransparency = 1
+    label.Text = "Players name"
+    label.TextScaled = true
+    label.Parent = contentFrame
+
+    local textbox = Instance.new("TextBox")
+    textbox.Size = UDim2.new(1, -20, 0, 30)
+    textbox.Position = UDim2.new(0, 10, 0, 35)
+    textbox.Text = ""
+    textbox.PlaceholderText = "Wpisz nick gracza"
+    textbox.Parent = contentFrame
+
+    local toggle = createToggleButton(contentFrame, "Help(tp and reset)", function(enabled, isRunning)
+        while enabled and isRunning() do
+            local playerName = textbox.Text
+            -- Killstreak logic: teleport to player and attack
+local targetName = textbox.Text
+local targetPlayer = game.Players:FindFirstChild(targetName)
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+if targetPlayer and targetPlayer.Character and character then
+    character:SetPrimaryPartCFrame(targetPlayer.Character.PrimaryPart.CFrame)
+            glove.Handle:FireTouchInterest(targetPlayer.Character.PrimaryPart, glove.Handle, 0)
+        glove.Handle:FireTouchInterest(targetPlayer.Character.PrimaryPart, glove.Handle, 1)
+    end
+end
+end
+            wait(1)
+        end
+    end)
+    toggle.Position = UDim2.new(0, 0, 0, 75)
+end
+
+tabContent["Run"] = function()
+    contentFrame:ClearAllChildren()
+    local toggle = createToggleButton(contentFrame, "Help all run users", function(enabled, isRunning)
+        while enabled and isRunning() do
+            -- Teleport to Run portal, teleport to player, enter arena
+local runPortal = workspace:FindFirstChild("RunPortal")
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+if runPortal and character then
+    character:SetPrimaryPartCFrame(runPortal.CFrame)
+end
+            wait(1)
+        end
+    end)
+end
+
+tabContent["Bus"] = function()
+    contentFrame:ClearAllChildren()
+    local toggle = createToggleButton(contentFrame, "Help all bus users", function(enabled, isRunning)
+        while enabled and isRunning() do
+            -- Teleport to bus, reset, enter arena
+local bus = workspace:FindFirstChild("Bus")
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+if bus and character then
+    character:SetPrimaryPartCFrame(bus.CFrame)
+    character:BreakJoints()
+end
+            wait(1)
+        end
+    end)
+end
+
+tabContent["Redacted"] = function()
+    contentFrame:ClearAllChildren()
+    local toggle = createToggleButton(contentFrame, "AutoTp to portal", function(enabled, isRunning)
+        while enabled and isRunning() do
+            -- Teleport to [REDACTED] portal, enter arena
+local portal = workspace:FindFirstChild("RedactedPortal")
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+if portal and character then
+    character:SetPrimaryPartCFrame(portal.CFrame)
+end
+            wait(1)
+        end
+    end)
+end
+
+tabContent["Moyai"] = function()
+    contentFrame:ClearAllChildren()
+    local toggle = createToggleButton(contentFrame, "Help all moyai users", function(enabled, isRunning)
+        while enabled and isRunning() do
+            -- Teleport to Moyai head, reset, enter arena
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+if character then
+    local moyaiHead = workspace:FindFirstChild("MoyaiHead")
+    if moyaiHead then
+        character:SetPrimaryPartCFrame(moyaiHead.CFrame)
+    end
+    character:BreakJoints()
+end
+            wait(1)
+        end
+    end)
+end
+
+tabContent["Tycoon"] = function()
+    contentFrame:ClearAllChildren()
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1,0,0,30)
+    label.BackgroundTransparency = 1
+    label.Text = "Enter player nick for auto-tycoon for him"
+    label.TextScaled = true
+    label.Parent = contentFrame
+
+    local textbox = Instance.new("TextBox")
+    textbox.Size = UDim2.new(1, -20, 0, 30)
+    textbox.Position = UDim2.new(0, 10, 0, 35)
+    textbox.Text = ""
+    textbox.PlaceholderText = "Wpisz nick gracza"
+    textbox.Parent = contentFrame
+
+    local toggle = createToggleButton(contentFrame, "Auto-tycoon", function(enabled, isRunning)
+        while enabled and isRunning() do
+            local playerName = textbox.Text
+            -- Auto-click tycoon for player
+local tycoon = workspace:FindFirstChild(playerName .. "Tycoon")
+if tycoon and tycoon:FindFirstChild("Button") then
+    fireclickdetector(tycoon.Button.ClickDetector)
+end
+        end
+    end)
+    toggle.Position = UDim2.new(0, 0, 0, 75)
+end
+
+tabContent["Voodoo"] = function()
+    contentFrame:ClearAllChildren()
+    local toggle = createToggleButton(contentFrame, "Die after voodoo doll has been slapped", function(enabled, isRunning)
+        while enabled and isRunning() do
+           -- Reset character after voodoo doll is slapped (Slap Battles logic)
+local player = game.Players.LocalPlayer
+local character = player and player.Character
+if character then
+    local voodooDoll = nil
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj.Name == "VoodooDoll" and obj:FindFirstChild("Owner") and obj.Owner.Value == player then
+            voodooDoll = obj
+            break
+        end
+    end
+    if voodooDoll and voodooDoll:FindFirstChild("Slapped") and voodooDoll.Slapped.Value == true then
+        character:BreakJoints()
+    end
+end
+            wait(1)
+        end
+    end)
+end
+
+-- Animacja przesuwania zakładek
+local yPos = 0
+local buttons = {}
+for _, tabName in ipairs(tabs) do
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -10, 0, 40)
+    button.Position = UDim2.new(0, 5, 0, yPos)
+    button.Text = tabName
+    button.Parent = sideMenu
+    button.BackgroundTransparency = 0.5
+    button.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    table.insert(buttons, button)
+    yPos = yPos + 45
+    button.MouseButton1Click:Connect(function()
+        if tabContent[tabName] then
+            tabContent[tabName]()
+        else
+            contentFrame:ClearAllChildren()
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1,0,1,0)
+            label.BackgroundTransparency = 1
+            label.Text = "Wybrałeś zakładkę: " .. tabName
+            label.TextScaled = true
+            label.Parent = contentFrame
+        end
+    end)
+end
+
+sideMenu.CanvasSize = UDim2.new(0,0,0,yPos)
+sideMenu.ScrollBarThickness = 8
+
+-- Animacja przesuwania
+local function animateButtons()
+    for i, button in ipairs(buttons) do
+        local goal = {}
+        goal.Position = UDim2.new(0, 5, 0, (i-1)*45)
+        local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal)
+        tween:Play()
+    end
+end
+animateButtons()
+
+closeBtn.MouseButton1Click:Connect(function()
+    gui.Enabled = false
+end)
+
+local minimized = false
+minimizeBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        mainFrame.Visible = false
+        minimizeBtn.Text = "🔼"
+    else
+        mainFrame.Visible = true
+        minimizeBtn.Text = "🔽"
+    end
+end)
